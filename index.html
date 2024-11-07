@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Complaint Management</title>
+</head>
+<body>
+    <h1>Complaint Management System</h1>
+
+    <h2>Add Complaint</h2>
+    <form id="add-complaint-form">
+        <label for="id">Complaint ID:</label>
+        <input type="text" id="id" required><br>
+        
+        <label for="details">Details:</label>
+        <input type="text" id="details" required><br>
+        
+        <label for="urgency">Urgency (1-5):</label>
+        <input type="number" id="urgency" min="1" max="5" required><br>
+        
+        <button type="submit">Add Complaint</button>
+    </form>
+
+    <h2>View All Complaints</h2>
+    <button id="view-complaints">View Complaints</button>
+    <pre id="complaints-list"></pre>
+
+    <h2>Resolve Complaint</h2>
+    <form id="resolve-complaint-form">
+        <label for="resolve-id">Complaint ID to Resolve:</label>
+        <input type="text" id="resolve-id" required><br>
+        
+        <button type="submit">Resolve Complaint</button>
+    </form>
+
+    <h2>Resolved Complaints Log</h2>
+    <button id="view-resolved-logs">View Resolved Logs</button>
+    <pre id="resolved-logs"></pre>
+
+    <script>
+        const apiUrl = 'http://localhost:3000';
+
+        // Add Complaint
+        document.getElementById('add-complaint-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const id = document.getElementById('id').value;
+            const details = document.getElementById('details').value;
+            const urgency = parseInt(document.getElementById('urgency').value);
+
+            const response = await fetch(`${apiUrl}/complaint`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id, details, urgency })
+            });
+            const result = await response.json();
+            alert(result.message);
+        });
+
+        // View Complaints
+        document.getElementById('view-complaints').addEventListener('click', async () => {
+            const response = await fetch(`${apiUrl}/complaints`);
+            const complaints = await response.json();
+            document.getElementById('complaints-list').textContent = JSON.stringify(complaints, null, 2);
+        });
+
+        // Resolve Complaint
+        document.getElementById('resolve-complaint-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const resolveId = document.getElementById('resolve-id').value;
+
+            const response = await fetch(`${apiUrl}/resolve/${resolveId}`, {
+                method: 'PUT'
+            });
+            const result = await response.json();
+            alert(result.message);
+        });
+
+        // View Resolved Logs
+        document.getElementById('view-resolved-logs').addEventListener('click', async () => {
+            const response = await fetch(`${apiUrl}/resolved-logs`);
+            const logs = await response.text();
+            document.getElementById('resolved-logs').textContent = logs;
+        });
+    </script>
+</body>
+</html>
